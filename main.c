@@ -124,7 +124,7 @@ static worrior_t worrior[20];
 
 
 
-static void dib_muro () { //Función encargada de dibujar los muros del mapa
+static void crear_paredes () { //Función encargada de dibujar los muros del mapa
 
 	SDL_Rect src;
 	int i;
@@ -147,7 +147,7 @@ static void dib_muro () { //Función encargada de dibujar los muros del mapa
 				printf("fill rectangle faliled in func draw_muro()");
 				}
 			}
-				if (i==149 )//&& (tirador[0].muerte==0||tirador[0].vida==0))
+				if (i==149 && (worrior[0].muerte==0||worrior[0].vida==0))
 				{
 					int r = SDL_FillRect(screen, &src, 0xffff5916);
 
@@ -179,10 +179,10 @@ static void dib_muro () { //Función encargada de dibujar los muros del mapa
 static void mapa1(){ //Función encargada de dibujar los muros del nivel 1
 
 
-	//portal = 0;
-	//tiempo=0;
-	//tiempo_vel=0;
-	//tirador[0].muerte=1;
+	portal = 0;
+	tiempo=0;
+	tiempo_vel=0;
+	worrior[0].muerte=1;
 
 	//lineas verticales
 	for (int i = 6; i <16 ; ++i)
@@ -255,9 +255,10 @@ static void mapa1(){ //Función encargada de dibujar los muros del nivel 1
 static void mapa2(){ //Función encargada de dibujar los muros del nivel 2
 
 
-	//tirador[0].muerte = 1;
-	//vida++;
-	//tirador[0].vida = vida;
+	worrior[0].muerte = 1;
+	lifes++;
+	worrior[0].vida = lifes;
+
 	//paredes verticales
 	muro[6].x = 404;
 	muro[6].y = 194;
@@ -444,6 +445,20 @@ static void dibuja_cuadro() {
 
 }
 
+static void muro_temp(int a){ //Es el muro que desaparece cuando el tirador sale de la sala de espera xD
+	switch (a) {
+		case 0 :
+		muro[73].x = 740;
+		muro[73].y = 290;
+		muro[73].w = 5;
+		muro[73].h = 47;
+		muro[74].x = 215;
+		muro[74].y = 290;
+		muro[74].w = 5;
+		muro[74].h = 47;
+		break;
+	}
+}
 
 //Inicializacion de la posicion y tamaño de los elementos
 static void game_inicialization() {
@@ -616,7 +631,7 @@ static void cuadro_de_juego(){ //Función encargada de dibujar la interfaz de us
 	SDL_BlitSurface(interfaz_in_user, &src, screen, &dest);
 }
 
-static void dib_tirador() { //Función encargada de dibujar al tirador mediante sprites con la librería SDL
+static void crea_worrior() { //muestra en pantalla al worrior y las vidas
 
 	SDL_Rect src;
 	SDL_Rect dest;
@@ -636,7 +651,7 @@ static void dib_tirador() { //Función encargada de dibujar al tirador mediante 
 	}
 }
 
-static void tirador_sprites () {//Función encargada de animar al tirador mediante sprites con la librería SDL
+static void tirador_sprites () {//dibuja al tirador caminando o disparando
 
 	SDL_Rect dest;
 	SDL_Rect src;
@@ -656,7 +671,7 @@ static void tirador_sprites () {//Función encargada de animar al tirador median
 				dest.w=36;
 				dest.h=36;
 				SDL_BlitSurface(sprites, &dest, screen, &src);
-				if((contador/7)<10)
+				if((contador/7)<10)////////////////////////////////////////////////////////
 				{
 					contador++;
 				}
@@ -687,248 +702,254 @@ static void tirador_sprites () {//Función encargada de animar al tirador median
 }
 
 
-static void tirador_movimiento(int d) { //Función encargada del movimiento del tirador
+static void tirador_movimiento(int direction) { //Función encargada del movimiento del tirador
 
 	int x,y;
-	int speed_ = 8;
+	int velocidad = 8;
 	x = worrior[0].x;
 	y = worrior[0].y;
+
 	if (worrior[0].vida>0 && worrior[0].muerte==0){}
 	if(t%3==2){
 
+// flecha arriba
+	if (direction == 0) {
+
+        if(worrior[0].y <= 0) {
+
+            worrior[0].y = 0;
+
+        }
+        else {
+            if ((worrior[0].x - 80) % 48 == 30 || (worrior[0].x - 80) % 48 == -18){
+                worrior[0].y -= velocidad;
+                worrior[0].direccion = 0;
+
+                if (cant_num_sprite_tir > 5 && cant_num_sprite_tir < 8)
+                {
+                    cant_num_sprite_tir++;
+                }
+                else
+                {
+                    cant_num_sprite_tir = 6;
+                }
+            }
+            else
+            {
+            if (worrior[0].direccion == 1)
+            {
+                worrior[0].x += velocidad;
+                worrior[0].direccion = 1;
+            if (cant_num_sprite_tir > 2 && cant_num_sprite_tir < 5)
+            {
+                cant_num_sprite_tir++;
+            }
+            else
+            {
+                cant_num_sprite_tir = 3;
+            }
+            }
+
+            if (worrior[0].direccion == 3)
+            {
+                worrior[0].x -= velocidad;
+                worrior[0].direccion = 3;
+            if (cant_num_sprite_tir < 2)
+            {
+                cant_num_sprite_tir++;
+            }
+            else{
+                cant_num_sprite_tir = 0;
+            }
+            }
+
+            }
+        }
+	}
+
 	// flecha abajo
-	if (d == 2) {
+	if (direction == 2) {
 
-	if(worrior[0].y >= screen->h - worrior[0].h) {
+        if(worrior[0].y >= screen->h - worrior[0].h) {
 
-	worrior[0].y = screen->h - worrior[0].h;
+        worrior[0].y = screen->h - worrior[0].h;
 
-	}
-	else {
+        }
+        else {
 
-	if ((worrior[0].x - 80) % 48 == 30 || (worrior[0].x - 80) % 48 == -18){
-		worrior[0].y += speed_;
-		worrior[0].direccion = 2;
-	if (cant_num_sprite_tir > 8 && cant_num_sprite_tir < 11)
-	{
-		cant_num_sprite_tir++;
-	}
-	else{
-		cant_num_sprite_tir = 9;
-	}
-	}
-	else
-	{
-	if (worrior[0].direccion == 1)
-	{
-		worrior[0].x += speed_;
-		worrior[0].direccion = 1;
-	if (cant_num_sprite_tir > 2 && cant_num_sprite_tir < 5)
-	{
-		cant_num_sprite_tir++;
-	}
-	else{
-		cant_num_sprite_tir = 3;
-	}
-	}
-	if (worrior[0].direccion == 3)
-	{
-		worrior[0].x -= speed_;
-		worrior[0].direccion = 3;
-	if (cant_num_sprite_tir < 2)
-	{
-		cant_num_sprite_tir++;
-	}
-	else{
-		cant_num_sprite_tir = 0;
-	}
-	}
-	}
-	}
-	}
-	// flecha arriba
-	if (d == 0) {
-
-	if(worrior[0].y <= 0) {
-
-		worrior[0].y = 0;
-
-	}
-	else {
-	if ((worrior[0].x - 80) % 48 == 30 || (worrior[0].x - 80) % 48 == -18){
-		worrior[0].y -= speed_;
-		worrior[0].direccion = 0;
-	if (cant_num_sprite_tir > 5 && cant_num_sprite_tir < 8)
-	{
-		cant_num_sprite_tir++;
-	}
-	else
-	{
-		cant_num_sprite_tir = 6;
-	}
-	}
-	else
-	{
-	if (worrior[0].direccion == 1)
-	{
-		worrior[0].x += speed_;
-		worrior[0].direccion = 1;
-	if (cant_num_sprite_tir > 2 && cant_num_sprite_tir < 5)
-	{
-		cant_num_sprite_tir++;
-	}
-	else
-	{
-		cant_num_sprite_tir = 3;
-	}
+        if ((worrior[0].x - 80) % 48 == 30 || (worrior[0].x - 80) % 48 == -18){
+            worrior[0].y += velocidad;
+            worrior[0].direccion = 2;
+        if (cant_num_sprite_tir > 8 && cant_num_sprite_tir < 11)
+        {
+            cant_num_sprite_tir++;
+        }
+        else{
+            cant_num_sprite_tir = 9;
+        }
+        }
+        else
+        {
+        if (worrior[0].direccion == 1)
+        {
+            worrior[0].x += velocidad;
+            worrior[0].direccion = 1;
+        if (cant_num_sprite_tir > 2 && cant_num_sprite_tir < 5)
+        {
+            cant_num_sprite_tir++;
+        }
+        else{
+            cant_num_sprite_tir = 3;
+        }
+        }
+        if (worrior[0].direccion == 3)
+        {
+            worrior[0].x -= velocidad;
+            worrior[0].direccion = 3;
+        if (cant_num_sprite_tir < 2)
+        {
+            cant_num_sprite_tir++;
+        }
+        else{
+            cant_num_sprite_tir = 0;
+        }
+        }
+        }
+        }
 	}
 
-	if (worrior[0].direccion == 3)
-	{
-		worrior[0].x -= speed_;
-		worrior[0].direccion = 3;
-	if (cant_num_sprite_tir < 2)
-	{
-		cant_num_sprite_tir++;
+// derecha
+	if (direction == 1) {
+
+        if(worrior[0].x >= screen->w - worrior[0].w) {
+
+            worrior[0].x = screen->w - worrior[0].w;
+
+        }
+        else
+        {
+        if ((worrior[0].y - 68) % 48 == 30 || (worrior[0].y - 68) % 48 == -18){
+                worrior[0].x += velocidad;
+                worrior[0].direccion = 1;
+            if (cant_num_sprite_tir > 2 && cant_num_sprite_tir < 5)
+            {
+                cant_num_sprite_tir++;
+            }
+            else{
+                cant_num_sprite_tir = 3;
+            }
+        }
+        else
+        {
+            if (worrior[0].direccion == 0)
+            {
+                    worrior[0].y -= velocidad;
+                    worrior[0].direccion = 0;
+                if (cant_num_sprite_tir > 5 && cant_num_sprite_tir < 8)
+                {
+                    cant_num_sprite_tir++;
+                }
+                else{
+                    cant_num_sprite_tir = 6;
+                }
+            }
+            if (worrior[0].direccion == 2)
+            {
+                    worrior[0].y += velocidad;
+                    worrior[0].direccion = 2;
+                if (cant_num_sprite_tir > 8 && cant_num_sprite_tir < 11)
+                {
+                    cant_num_sprite_tir++;
+                }
+                else{
+                    cant_num_sprite_tir = 9;
+                }
+            }
+        }
+        }
 	}
-	else{
-		cant_num_sprite_tir = 0;
-	}
+	// izquierda
+	if (direction == 3) {
+
+        if(worrior[0].x <= 0) {
+
+            worrior[0].x = 0;
+
+        }
+        else
+        {
+
+            if ((worrior[0].y - 68) % 48 == 30 || (worrior[0].y - 68) % 48 == -18){
+                worrior[0].x -= velocidad;
+                worrior[0].direccion = 3;
+            if (cant_num_sprite_tir < 2)
+        {
+            cant_num_sprite_tir++;
+        }
+        else{
+                cant_num_sprite_tir = 0;
+            }
+            }
+            else
+            {
+                if (worrior[0].direccion == 0)
+            {
+                worrior[0].y -= velocidad;
+                worrior[0].direccion = 0;
+            if (cant_num_sprite_tir > 5 && cant_num_sprite_tir < 8)
+            {
+                cant_num_sprite_tir++;
+            }
+            else{
+                cant_num_sprite_tir = 6;
+            }
+            }
+            if (worrior[0].direccion == 2)
+            {
+                worrior[0].y += velocidad;
+                worrior[0].direccion = 2;
+
+            if (cant_num_sprite_tir > 8 && cant_num_sprite_tir < 11)
+            {
+                cant_num_sprite_tir++;
+            }
+
+            else
+            {
+                cant_num_sprite_tir = 9;
+            }
+            }
+            }
+        }
 	}
 
-	}
-	}
-	}
+	for (int i = 0; i < 150; ++i)
+	{
+        if (verif_colision_tirador(worrior[0],muro[i])==1)
+        {
+            if (i == 71 || i == 72){
 
-	if (d == 1) {
+            if (i==71){
+                worrior[0].x = 702;
+                worrior[0].y = 296;
+                portal=1;
+            }
+            else{
+                worrior[0].x = 222;
+                worrior[0].y = 296;
+                portal=1;
 
-	if(worrior[0].x >= screen->w - worrior[0].w) {
+            }
+            }
 
-		worrior[0].x = screen->w - worrior[0].w;
-
+            else
+            {
+                worrior[0].y = y;
+                worrior[0].x = x;
+            }
+        }
 	}
-	else
-	{
-	if ((worrior[0].y - 68) % 48 == 30 || (worrior[0].y - 68) % 48 == -18){
-		worrior[0].x += speed_;
-		worrior[0].direccion = 1;
-	if (cant_num_sprite_tir > 2 && cant_num_sprite_tir < 5)
-	{
-		cant_num_sprite_tir++;
-	}
-	else{
-		cant_num_sprite_tir = 3;
-	}
-	}
-	else
-	{
-	if (worrior[0].direccion == 0)
-	{
-		worrior[0].y -= speed_;
-		worrior[0].direccion = 0;
-	if (cant_num_sprite_tir > 5 && cant_num_sprite_tir < 8)
-	{
-		cant_num_sprite_tir++;
-	}
-	else{
-		cant_num_sprite_tir = 6;
-	}
-	}
-	if (worrior[0].direccion == 2)
-	{
-		worrior[0].y += speed_;
-		worrior[0].direccion = 2;
-	if (cant_num_sprite_tir > 8 && cant_num_sprite_tir < 11)
-	{
-		cant_num_sprite_tir++;
-	}
-	else{
-		cant_num_sprite_tir = 9;
-	}
-	}
-	}
-	}
-	}
-	//Tirador izquierda
-	if (d == 3) {
-
-	if(worrior[0].x <= 0) {
-
-		worrior[0].x = 0;
-
-	} else
-	{
-
-	if ((worrior[0].y - 68) % 48 == 30 || (worrior[0].y - 68) % 48 == -18){
-		worrior[0].x -= speed_;
-		worrior[0].direccion = 3;
-	if (cant_num_sprite_tir < 2)
-	{
-		cant_num_sprite_tir++;
-	}
-	else{
-		cant_num_sprite_tir = 0;
-	}
-	}
-	else
-	{
-	if (worrior[0].direccion == 0)
-	{
-		worrior[0].y -= speed_;
-		worrior[0].direccion = 0;
-	if (cant_num_sprite_tir > 5 && cant_num_sprite_tir < 8)
-	{
-		cant_num_sprite_tir++;
-	}
-	else{
-		cant_num_sprite_tir = 6;
-	}
-	}
-	if (worrior[0].direccion == 2)
-	{
-		worrior[0].y += speed_;
-		worrior[0].direccion = 2;
-
-	if (cant_num_sprite_tir > 8 && cant_num_sprite_tir < 11)
-	{
-		cant_num_sprite_tir++;
-	}
-
-	else
-	{
-		cant_num_sprite_tir = 9;
-	}
-	}
-	}
-	}
-	}
-/*	for (int i = 0; i < 150; ++i)
-	{
-	if (verif_colision_tirador(worrior[0],muro[i])==1)
-	{
-	if (i == 71 || i == 72){
-
-	if (i==71){
-		worrior[0].x = 542;
-		worrior[0].y = 146;
-		portal=1;
-	}
-	else{
-		worrior[0].x = 62;
-		worrior[0].y = 146;
-		portal=1;
-
-	}
-	}
-
-	else
-	{
-		worrior[0].y = y;
-		worrior[0].x = x;
-	}
-	}
-	}
-	for (int i = 0; i < enemigos_tot; ++i)
+	/*for (int i = 0; i < enemigos_tot; ++i)
 	{
 	if (verif_colision_tiradorenemigo(enemigo[i] , worrior[0]) == 1)
 	{
@@ -942,6 +963,113 @@ static void tirador_movimiento(int d) { //Función encargada del movimiento del 
 	}
  }
 
+
+ static void tirador_mov(int mov){ // movimiento de salida del tirador de la sala de espera
+
+	SDL_Rect src;
+	SDL_Rect dest;
+
+	src.x = 666;
+	src.y = 497;
+	src.w = 12;
+	src.h = 20;
+
+
+	int velocidad = 8;
+	muro_temp(2);
+	if (worrior[0].muerte==1)
+	{
+		muro_temp(2);
+
+		if (worrior[0].vida>0)
+		{
+			tiempo_vida++;
+			dest.x = 484;
+			dest.y = 216 - ((tiempo_vida / 30)%11)*24;//////////////////////////
+			dest.w = 12;
+			dest.h = 20;
+			SDL_BlitSurface(sprites, &dest, screen, &src);
+
+
+			if (mov==0)
+			{
+				if ((tiempo_vida / 30)%11==10)
+				{
+					if (worrior[1].y != 440)
+					{
+						worrior[1].y -= velocidad;
+					}
+					if (worrior[1].y == 440)
+					{
+						worrior[0].x = 702;
+						worrior[0].y = 440;
+						worrior[0].muerte=0;
+						--worrior[0].vida;
+						--lifes;
+						worrior[1].y = 488;
+						muro_temp(2);
+						tiempo_vida=0;
+					}
+				}
+			}
+			if (mov==1)
+			{
+				if (worrior[1].y != 440)
+				{
+					worrior[1].y -= velocidad;
+				}
+				if (worrior[1].y == 440)
+				{
+					worrior[0].x = 702;
+					worrior[0].y = 440;
+					worrior[0].muerte=0;
+					--worrior[0].vida;
+					--lifes;
+					worrior[1].y = 488;
+					muro_temp(2);
+					tiempo_vida=0;
+				}
+			}
+		}
+	}
+}
+
+//Retorna 1 si ocurre la colision y 0 si no ocurre
+int verif_colision_tirador(worrior_t a, muro_t b) {
+
+	int left_a, left_b;
+	int right_a, right_b;
+	int top_a, top_b;
+	int bottom_a, bottom_b;
+
+	left_a = a.x;
+	right_a = a.x + a.w;
+	top_a = a.y;
+	bottom_a = a.y + a.h;
+
+	left_b = b.x;
+	right_b = b.x + b.w;
+	top_b = b.y;
+	bottom_b = b.y + b.h;
+
+
+	if (left_a > right_b) {
+		return 0;
+	}
+
+	if (right_a < left_b) {
+		return 0;
+	}
+
+	if (top_a > bottom_b) {
+		return 0;
+	}
+
+	if (bottom_a < top_b) {
+		return 0;
+	}
+
+	return 1;}
 
 
 // Main function
@@ -975,8 +1103,9 @@ int main (int argc, char *args[]) {
 
 	//render loop
 	while(quit == FALSE) {
-
-		//check for new events every frame
+        t++;
+        tiempo_vel++;
+        //check for new events every frame
 		SDL_PumpEvents();
 
 		const Uint8 *keystate = SDL_GetKeyboardState(NULL);
@@ -1001,7 +1130,7 @@ int main (int argc, char *args[]) {
 		if (keystate[SDL_SCANCODE_W]) {//Detecta cuando se presiona la tecla W
 
 			tirador_movimiento(0);
-			//tirador_mov(1);
+			tirador_mov(1);
 		}
 		if (keystate[SDL_SCANCODE_D]){//Detecta cuando se presiona la tecla D
 			tirador_movimiento(1);
@@ -1017,7 +1146,7 @@ int main (int argc, char *args[]) {
 		SDL_FillRect(screen, NULL, 0x000000ff);
 
 
-		if (accion == 0){
+        if (accion == 0){
             if (select<4){
 
                 if (keystate[SDL_SCANCODE_SPACE]){
@@ -1067,12 +1196,14 @@ int main (int argc, char *args[]) {
 
 		}
 
-		if(accion==1){
+		else if(accion==1){
             cuadro_de_juego();
 
-
-            dib_muro();
-            dib_tirador();
+            tirador_mov(0);
+            muro_temp(1);
+            crear_paredes();
+            tirador_sprites();
+            crea_worrior();
 
 		}
 
